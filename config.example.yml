@@ -12,6 +12,3 @@ sensors:
     enabled: true
     update_interval: 60
     GPIO_pin_RPI: 4
-
-
-
