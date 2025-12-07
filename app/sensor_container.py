@@ -63,6 +63,7 @@ def main():
     password = config['mqtt']['password']
     device_name = config['device']['name']
     sensor_type = config['sensors'][0]['type']  # assuming first sensor for simplicity
+    update_interval = config['sensors'][0]['update_interval']
 
 
     client = mqtt.Client(client_id=f"{device_name}_sensor_container")
