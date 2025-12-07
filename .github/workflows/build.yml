@@ -29,5 +29,5 @@ jobs:
                     context: .
                     platforms: linux/arm64
                     push: false
-                    tags: MIO_SDP_SensorContainer:arm64
+                    tags: mio_sdp_container:arm64
             
