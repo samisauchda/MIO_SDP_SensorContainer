@@ -102,29 +102,13 @@ sensors:
 ### Setup Development Environment
 
 ```bash
-# Run the setup script
-./setup.sh
-
-# Or manually:
+# manually:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt -r requirements-dev.txt
 pre-commit install
 ```
 
-
-### Run Tests
-
-```bash
-# Run all tests
-pytest tests/ -v
-
-# With coverage
-pytest tests/ -v --cov=app --cov-report=html
-
-# Or use make
-make test
-```
 
 ## 🏗️ Architecture
 
@@ -155,10 +139,7 @@ make test
 ```
 .
 ├── app/                    # Application code
-│   ├── sensors/            # Sensor implementations
-│   ├── mqtt_client.py      # MQTT communication
-│   └── config.py           # Configuration handling
-├── tests/                  # Test suite
+│   └── sensor_container.py # Sensor and MQTT code
 ├── docs/                   # Documentation
 ├── .github/                # GitHub templates and workflows
 │   ├── workflows/          # CI/CD pipelines
@@ -167,7 +148,6 @@ make test
 ├── requirements.txt        # Python dependencies
 ├── requirements-dev.txt    # Development dependencies
 ├── config.example.yml      # Example configuration
-├── setup.sh                # Setup script
 ├── LICENSE                 # License Info
 └── README.md               # This file
 ```
@@ -199,16 +179,6 @@ Security is a priority.
 
 **Never commit sensitive information like passwords or API keys!**
 
-## 🙏 Acknowledgments
-
-Built for an IoT systems course, demonstrating:
-
-- Modern containerization practices
-- CI/CD automation
-- Test-driven development
-- Git workflow best practices
-- Security-first design
-- Comprehensive documentation
 
 ## 📝 License
 
