@@ -1,0 +1,10 @@
+services:
+  sensor-container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sensor-container
+    restart: unless-stopped
+    volumes:
+      - ./app:/app
+    environment:
