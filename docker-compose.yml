@@ -8,3 +8,6 @@ services:
     volumes:
       - ./app:/app
     environment:
+      MQTT_BROKER: "localhost"
+      MQTT_PORT: "1883"
+      DEVICE_NAME: "Living Room Sensor"
