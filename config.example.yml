@@ -1,0 +1,13 @@
+mqtt:
+  broker: "homeassistant.local"
+  port: 1883
+  username: "your_username"
+  password: "your_password"
+
+device:
+  name: "Living Room Sensor"
+
+sensors:
+  - type: "dht11"
+    enabled: true
+    update_interval: 60
