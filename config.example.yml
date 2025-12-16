@@ -11,4 +11,3 @@ sensors:
   - type: "dht11"
     enabled: true
     update_interval: 60
-    GPIO_pin_RPI: 4
