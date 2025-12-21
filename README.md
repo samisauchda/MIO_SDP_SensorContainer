@@ -32,13 +32,15 @@ A containerized IoT sensor node that automatically integrates with Home Assistan
 
 ### Installation
 
+#### Option 1: With Custom Configuration (Recommended)
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/samisauchda/MIO_SDP_SensorContainer.git
    cd MIO_SDP_SensorContainer
    ```
 
-2. **Adjust config:**
+2. **Create your config:**
    ```bash
    # Copy and configure the example config
    cp config.example.yml config.yml
@@ -55,9 +57,27 @@ A containerized IoT sensor node that automatically integrates with Home Assistan
    docker-compose logs -f
    ```
 
+#### Option 2: Using Pre-built Image with Default Config
+
+The Docker image includes a default configuration based on `config.example.yml`. You can run it directly:
+
+```bash
+docker run -d --name sensor-container <image-name>
+```
+
+**Note:** The default config uses placeholder values. For production use, create a custom `config.yml` and use Option 1.
+
 Your sensors should now appear automatically in Home Assistant! 🎉
 
 ## ⚙️ Configuration
+
+### Configuration File
+
+The application uses `config.yml` for all settings. The configuration is handled flexibly:
+
+- **Pre-built images** include a default config (from `config.example.yml`) for quick testing
+- **Docker Compose** mounts your custom `config.yml` to override the default
+- **Development** allows direct editing of `config.yml` for immediate changes
 
 Edit `config.yml` to set your MQTT broker and sensors:
 
@@ -70,7 +90,7 @@ mqtt:
 
 device:
   name: "Living Room Sensor"
-  
+
 sensors:
   - type: "dht11"
     enabled: true
