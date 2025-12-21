@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 - Comprehensive test suite with pytest
 - Configuration via YAML file
 - Docker Compose setup for easy deployment
+- Default config embedded in Docker image for pre-built image support
+- Volume mount in docker-compose.yml for custom config override
 
 ### Changed
 - None
