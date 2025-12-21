@@ -9,7 +9,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir ruff
 
 COPY /app /app
-COPY config.example.yml /app/config.yml
 WORKDIR /app
 
 RUN ruff check .
