@@ -1,10 +1,17 @@
 services:
   sensor-container:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    # For deployment: use pre-built image from Docker Hub
+    # Replace 'yourusername/sensor-container:latest' with your actual image name
+    image: yourusername/sensor-container:latest
+
     container_name: sensor-container
     restart: unless-stopped
+
     volumes:
-      - ./app:/app
+      # Mount your custom config file to override the default
       - ./config.yml:/app/config.yml
+
+    # Uncomment if you need GPIO access on Raspberry Pi
+    # devices:
+    #   - /dev/gpiomem:/dev/gpiomem
+    # privileged: true
