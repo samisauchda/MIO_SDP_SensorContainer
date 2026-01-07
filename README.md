@@ -29,8 +29,50 @@ A containerized IoT sensor node that automatically integrates with Home Assistan
 - Docker and Docker Compose
 - Home Assistant with MQTT integration
 - MQTT broker (like Mosquitto)
+- Raspberry Pi (for physical sensor deployment)
 
-### Installation
+### Deployment on Raspberry Pi (Recommended)
+
+Deploy the pre-built Docker image on your Raspberry Pi:
+
+1. **Download deployment files:**
+   ```bash
+   mkdir ~/sensor-container
+   cd ~/sensor-container
+
+   # Download docker-compose.yml and config.example.yml from repository
+   wget https://raw.githubusercontent.com/samisauchda/MIO_SDP_SensorContainer/main/docker-compose.yml
+   wget https://raw.githubusercontent.com/samisauchda/MIO_SDP_SensorContainer/main/config.example.yml
+   ```
+
+2. **Create your configuration:**
+   ```bash
+   cp config.example.yml config.yml
+   # Edit config.yml with your MQTT broker and sensor details
+   nano config.yml
+   ```
+
+3. **Update image name in docker-compose.yml:**
+   ```bash
+   nano docker-compose.yml
+   # Replace 'yourusername/sensor-container:latest' with the actual image name
+   ```
+
+4. **Deploy the container:**
+   ```bash
+   docker-compose up -d
+   ```
+
+5. **Check the logs:**
+   ```bash
+   docker-compose logs -f
+   ```
+
+Your sensors should now appear automatically in Home Assistant! 🎉
+
+### Local Development
+
+For local development and testing:
 
 1. **Clone the repository:**
    ```bash
@@ -38,28 +80,45 @@ A containerized IoT sensor node that automatically integrates with Home Assistan
    cd MIO_SDP_SensorContainer
    ```
 
-2. **Adjust config:**
+2. **Create your config:**
    ```bash
-   # Copy and configure the example config
    cp config.example.yml config.yml
    # Edit config.yml with your MQTT broker and sensor details
    ```
 
-3. **Start the container:**
+3. **Start with development compose file:**
    ```bash
-   docker-compose up -d
+   docker-compose -f docker-compose.dev.yml up -d
    ```
 
 4. **Check the logs:**
    ```bash
-   docker-compose logs -f
+   docker-compose -f docker-compose.dev.yml logs -f
    ```
 
-Your sensors should now appear automatically in Home Assistant! 🎉
+### Building and Pushing Your Own Image
+
+If you want to build and publish your own image:
+
+```bash
+# Build the image
+docker build -t yourusername/sensor-container:latest .
+
+# Push to Docker Hub
+docker push yourusername/sensor-container:latest
+```
 
 ## ⚙️ Configuration
 
-Edit `config.yml` to set your MQTT broker and sensors:
+### Configuration File
+
+The application uses `config.yml` for all settings. Configuration is handled flexibly:
+
+- **Pre-built Docker images** include a default config (from `config.example.yml`) that works out-of-the-box for testing
+- **Production deployment** uses volume mount to override with your custom `config.yml` (recommended)
+- **Development** mounts the local directory for live code and config changes
+
+**For Raspberry Pi deployment**, create your own `config.yml` to set MQTT broker credentials and sensor configuration:
 
 ```yaml
 mqtt:
@@ -70,7 +129,7 @@ mqtt:
 
 device:
   name: "Living Room Sensor"
-  
+
 sensors:
   - type: "dht11"
     enabled: true
@@ -143,7 +202,8 @@ pre-commit install
 ├── docs/                   # Documentation
 ├── .github/                # GitHub templates and workflows
 │   ├── workflows/          # CI/CD pipelines
-├── docker-compose.yml      # Docker Compose configuration
+├── docker-compose.yml      # Production deployment (uses pre-built image)
+├── docker-compose.dev.yml  # Development (builds locally)
 ├── Dockerfile              # Container definition
 ├── requirements.txt        # Python dependencies
 ├── requirements-dev.txt    # Development dependencies

@@ -1,0 +1,20 @@
+services:
+  sensor-container:
+    # For development: build image locally
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: sensor-container-dev
+    restart: unless-stopped
+
+    volumes:
+      # Mount source code for live development
+      - ./app:/app
+      # Mount config file
+      - ./config.yml:/app/config.yml
+
+    # Uncomment if you need GPIO access for testing
+    # devices:
+    #   - /dev/gpiomem:/dev/gpiomem
+    # privileged: true
