@@ -48,66 +48,69 @@ You should now see two secrets listed:
 
 ## Using the Release Pipeline
 
-The release pipeline automatically triggers when you push a git tag following semantic versioning.
+The release pipeline automatically triggers in two scenarios:
+1. **When you merge to main** - Pushes as `latest` tag
+2. **When you push a version tag** - Pushes with semantic version + `latest` tags
 
-### Release Workflow (Following Git Flow)
+### Release Workflow (Simplified GitHub Flow)
 
-1. **Create release branch** from `develop`:
+1. **Prepare the release on develop**:
    ```bash
    git checkout develop
    git pull origin develop
-   git checkout -b release/1.0.0
+
+   # Update CHANGELOG.md with version changes
+   # Test thoroughly
+   # Commit changes
+   git add docs/CHANGELOG.md
+   git commit -m "Prepare for release 1.0.0"
+   git push origin develop
    ```
 
-2. **Prepare the release**:
-   - Update `docs/CHANGELOG.md` with version changes
-   - Fix any last-minute bugs
-   - Test thoroughly
-
-3. **Merge to main** via Pull Request:
+2. **Merge to main** via Pull Request:
    ```bash
-   # Push release branch
-   git push origin release/1.0.0
-
-   # Create PR: release/1.0.0 → main
+   # Create PR on GitHub: develop → main
    # Get approval and merge
    ```
 
-4. **Tag the release** on main:
+   **Automatic trigger**: Merging to main automatically builds and pushes Docker image with `latest` tag.
+
+3. **Tag the release** on main (for versioned release):
    ```bash
    git checkout main
    git pull origin main
    git tag -a v1.0.0 -m "Release version 1.0.0"
-   git push origin main --tags
+   git push origin --tags
    ```
 
-5. **Merge back to develop**:
+   **Automatic trigger**: Tag push builds and pushes Docker image with both `1.0.0` and `latest` tags.
+
+4. **Sync develop with main**:
    ```bash
    git checkout develop
-   git pull origin develop
-   git merge --no-ff release/1.0.0
+   git merge main
    git push origin develop
-
-   # Clean up release branch
-   git branch -d release/1.0.0
-   git push origin --delete release/1.0.0
    ```
 
-6. **Monitor the pipeline**:
+5. **Monitor the pipeline**:
    - Go to GitHub → **Actions** tab
    - Watch the "Release Pipeline" workflow
    - Check for successful completion
 
 ### What Happens Automatically
 
-When you push a tag (e.g., `v1.0.0`):
+**On merge to main:**
+1. GitHub Actions triggers the Release Pipeline
+2. Docker image is built for ARM64 architecture
+3. Image is pushed to Docker Hub as `samisauchda/sensor-container:latest`
 
+**On tag push (e.g., `v1.0.0`):**
 1. GitHub Actions triggers the Release Pipeline
 2. Version is extracted from tag (`v1.0.0` → `1.0.0`)
 3. Docker image is built for ARM64 architecture
 4. Two images are pushed to Docker Hub:
    - `samisauchda/sensor-container:1.0.0` (semantic version)
-   - `samisauchda/sensor-container:latest` (always points to newest)
+   - `samisauchda/sensor-container:latest` (updated to this version)
 
 ### Version Numbering
 
@@ -163,6 +166,14 @@ Examples:
 **Solution**:
 - Always prefix tags with `v` (e.g., `v1.0.0`, not `1.0.0`)
 - Use semantic versioning format: `vMAJOR.MINOR.PATCH`
+
+### Pipeline runs twice (on merge and tag)
+
+**Expected behavior**: When you merge to main AND push a tag, two workflows run:
+1. Main branch push → pushes `latest` tag
+2. Tag push → pushes versioned tag (e.g., `1.0.0`) and updates `latest`
+
+**Note**: This is normal. The second workflow (tag push) will overwrite `latest` with the properly versioned image. If you want to avoid the double build, wait a moment after merging to main before pushing the tag, or tag first then merge.
 
 ## Verifying Releases
 

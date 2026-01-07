@@ -2,6 +2,8 @@ name: Release Pipeline
 
 on:
     push:
+        branches:
+            - main
         tags:
             - 'v*'
 
@@ -15,11 +17,23 @@ jobs:
             -   name: Check out repository
                 uses: actions/checkout@v4
 
-            -   name: Extract version from tag
+            -   name: Determine version and tags
+                id: meta
                 run: |
-                    VERSION=${GITHUB_REF#refs/tags/v}
-                    echo "VERSION=$VERSION" >> $GITHUB_ENV
-                    echo "Building version: $VERSION"
+                    if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+                        # Tagged release - extract semantic version
+                        VERSION=${GITHUB_REF#refs/tags/v}
+                        TAGS="samisauchda/sensor-container:${VERSION},samisauchda/sensor-container:latest"
+                        echo "VERSION=$VERSION" >> $GITHUB_ENV
+                        echo "TAGS=$TAGS" >> $GITHUB_ENV
+                        echo "Building tagged release: $VERSION"
+                    else
+                        # Main branch push - use latest tag only
+                        TAGS="samisauchda/sensor-container:latest"
+                        echo "VERSION=latest" >> $GITHUB_ENV
+                        echo "TAGS=$TAGS" >> $GITHUB_ENV
+                        echo "Building main branch as latest"
+                    fi
 
             -   name: Set up QEMU
                 uses: docker/setup-qemu-action@v3
@@ -41,14 +55,14 @@ jobs:
                     context: .
                     platforms: linux/arm64
                     push: true
-                    tags: |
-                        samisauchda/sensor-container:${{ env.VERSION }}
-                        samisauchda/sensor-container:latest
+                    tags: ${{ env.TAGS }}
                     cache-from: type=gha
                     cache-to: type=gha,mode=max
 
             -   name: Image push summary
                 run: |
-                    echo "✓ Successfully pushed Docker images:"
-                    echo "  - samisauchda/sensor-container:${{ env.VERSION }}"
-                    echo "  - samisauchda/sensor-container:latest"
+                    echo "✓ Successfully pushed Docker image(s):"
+                    IFS=',' read -ra TAG_ARRAY <<< "${{ env.TAGS }}"
+                    for tag in "${TAG_ARRAY[@]}"; do
+                        echo "  - $tag"
+                    done

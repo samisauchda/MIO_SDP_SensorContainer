@@ -1,6 +1,6 @@
 # Branching Strategy
 
-This document describes the branching strategy used in this project, following a modified Git Flow model optimized for continuous delivery.
+This document describes the branching strategy used in this project, following a simplified GitHub Flow model optimized for continuous delivery.
 
 ## Branch Overview
 
@@ -9,13 +9,12 @@ main (production)
   ├── v1.0.0 (tag)
   ├── v1.1.0 (tag)
   └── v2.0.0 (tag)
-  
+
 develop (integration)
   ├── feature/mqtt-reconnect
   ├── feature/sensor-bme280
   └── feature/web-dashboard
-  
-release/1.1.0 (preparation)
+```
 
 
 ## Branch Types
@@ -27,12 +26,16 @@ release/1.1.0 (preparation)
 **Characteristics:**
 - Always stable and deployable
 - Protected branch (requires PR and reviews)
-- All commits are tagged with version numbers
+- Release commits are tagged with version numbers
 - Direct commits are not allowed
 - Triggers production deployment pipeline
 
 **Merges from:**
-- `release/*` branches (normal releases)
+- `develop` branch (for releases)
+
+**Versioning:**
+- After merging to main, tag the commit with semantic version
+- Tags trigger automated Docker image builds and pushes
 
 
 ### 2. `develop` Branch
@@ -42,15 +45,15 @@ release/1.1.0 (preparation)
 **Characteristics:**
 - Contains latest completed development features
 - Should always be in a working state
-- Automatically deployed to development/staging environment
+- Automatically tested via CI/CD
 - Base branch for new features
 
 **Merges from:**
 - `feature/*` branches (new features)
-- `release/*` branches (after release to main)
+- `main` (to keep in sync after releases)
 
 **Merges to:**
-- `release/*` branches
+- `main` (when ready for release)
 
 **Lifetime:** Permanent
 
@@ -96,54 +99,7 @@ git push origin feature/sensor-bme280
 
 **Merges to:** `develop`
 
-### 4. `release/*` Branches
-
-**Purpose:** Prepare for production release
-
-**Naming Convention:**
-```
-release/X.Y.Z
-```
-
-**Examples:**
-- `release/1.0.0`
-- `release/1.1.0`
-- `release/2.0.0`
-
-**Workflow:**
-```bash
-# Create release branch from develop
-git checkout develop
-git pull origin develop
-git checkout -b release/1.1.0
-
-# Prepare release
-# - Update version numbers
-# - Update CHANGELOG.md
-# - Fix release-specific bugs
-# - Update documentation
-
-# When ready, merge to main
-git checkout main
-git pull origin main
-git merge --no-ff release/1.1.0
-git tag -a v1.1.0 -m "Release version 1.1.0"
-git push origin main --tags
-
-# Merge back to develop
-git checkout develop
-git pull origin develop
-git merge --no-ff release/1.1.0
-git push origin develop
-
-# Delete release branch
-git branch -d release/1.1.0
-git push origin --delete release/1.1.0
-```
-
-**Merges from:** `develop`
-
-**Merges to:** `main` and `develop`
+**Lifetime:** Temporary (deleted after PR merge)
 
 
 ## Complete Workflow Examples
@@ -183,32 +139,32 @@ git branch -d feature/add-bme280
 ### Example 2: Creating a Release
 
 ```bash
-# 1. Create release branch
+# 1. Prepare release on develop
 git checkout develop
 git pull origin develop
-git checkout -b release/1.1.0
 
-# 2. Prepare release
-# - Update version in files
-# - Update CHANGELOG.md
-# - Fix any last-minute bugs
-git commit -m "Prepare release 1.1.0"
+# Update CHANGELOG.md with version and changes
+# Test thoroughly to ensure everything works
 
-# 3. Merge to main
+# 2. Create PR from develop to main
+# Create PR on GitHub: develop → main
+# Get approval and merge
+
+# 3. Tag the merge commit on main
 git checkout main
 git pull origin main
-git merge --no-ff release/1.1.0
-git tag -a v1.1.0 -m "Release 1.1.0"
-git push origin main --tags
+git tag -a v1.1.0 -m "Release version 1.1.0"
+git push origin --tags
 
-# 4. Merge back to develop
+# 4. Sync develop with main (if needed)
 git checkout develop
-git pull origin develop
-git merge --no-ff release/1.1.0
+git merge main
 git push origin develop
 
-# 5. Clean up
-git branch -d release/1.1.0
+# This triggers the automated release pipeline:
+# - Docker image builds for ARM64
+# - Pushes to Docker Hub as samisauchda/sensor-container:1.1.0
+# - Updates the "latest" tag
 ```
 
 ## Quick Reference
@@ -218,16 +174,34 @@ git branch -d release/1.1.0
 git checkout develop && git pull
 git checkout -b feature/my-feature
 
-# Prepare release
-git checkout develop && git pull
-git checkout -b release/1.1.0
-
 # Update feature with latest develop
 git checkout develop && git pull
 git checkout feature/my-feature
 git merge develop
 
-# Clean up merged branch
+# Create release
+# 1. Merge develop → main via PR
+# 2. Tag on main:
+git checkout main && git pull
+git tag -a v1.1.0 -m "Release 1.1.0"
+git push origin --tags
+
+# Clean up merged feature branch
 git branch -d feature/my-feature
 git push origin --delete feature/my-feature
 ```
+
+## Semantic Versioning
+
+This project follows [Semantic Versioning](https://semver.org/):
+
+- **MAJOR.MINOR.PATCH** (e.g., `v1.2.3`)
+  - **MAJOR**: Breaking changes
+  - **MINOR**: New features, backwards compatible
+  - **PATCH**: Bug fixes, backwards compatible
+
+Examples:
+- `v1.0.0` - First stable release
+- `v1.1.0` - Added new sensor support
+- `v1.1.1` - Fixed MQTT reconnection bug
+- `v2.0.0` - Breaking API changes
