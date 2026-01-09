@@ -52,18 +52,12 @@ Deploy the pre-built Docker image on your Raspberry Pi:
    nano config.yml
    ```
 
-3. **Update image name in docker-compose.yml:**
-   ```bash
-   nano docker-compose.yml
-   # Replace 'yourusername/sensor-container:latest' with the actual image name
-   ```
-
-4. **Deploy the container:**
+3. **Deploy the container:**
    ```bash
    docker-compose up -d
    ```
 
-5. **Check the logs:**
+4. **Check the logs:**
    ```bash
    docker-compose logs -f
    ```
@@ -95,18 +89,6 @@ For local development and testing:
    ```bash
    docker-compose -f docker-compose.dev.yml logs -f
    ```
-
-### Building and Pushing Your Own Image
-
-If you want to build and publish your own image:
-
-```bash
-# Build the image
-docker build -t yourusername/sensor-container:latest .
-
-# Push to Docker Hub
-docker push yourusername/sensor-container:latest
-```
 
 ## ⚙️ Configuration
 
@@ -225,7 +207,6 @@ We use a modified Git Flow:
 - `main` - Production-ready code
 - `develop` - Integration branch
 - `feature/*` - New features
-- `release/*` - Release preparation
 
 See [BRANCHING_STRATEGY.md](docs/BRANCHING_STRATEGY.md) for detailed workflow.
 
