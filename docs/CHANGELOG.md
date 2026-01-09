@@ -30,3 +30,6 @@ All notable changes to this project will be documented in this file.
 ### Security
 - None
 
+## v1.1
+### Fixed
+- fixed an error in the docker-compose file where the eocker-compose file did not get the correct image from the repository

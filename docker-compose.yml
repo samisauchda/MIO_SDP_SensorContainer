@@ -1,8 +1,6 @@
 services:
   sensor-container:
-    # For deployment: use pre-built image from Docker Hub
-    # Replace 'yourusername/sensor-container:latest' with your actual image name
-    image: yourusername/sensor-container:latest
+    image: samisauchda/sensor-container:latest
 
     container_name: sensor-container
     restart: unless-stopped
