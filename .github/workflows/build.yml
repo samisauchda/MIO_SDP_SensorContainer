@@ -87,8 +87,10 @@ jobs:
                     push: false
                     tags: mio_sdp_container:latest
                     target: lint
-                    cache-from: type=gha
-                    cache-to: type=gha,mode=max
+                    cache-from: |
+                        type=gha,scope=lint
+                        type=gha,scope=production
+                    cache-to: type=gha,mode=max,scope=lint
 
 
     # security-scan:

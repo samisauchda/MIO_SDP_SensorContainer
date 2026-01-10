@@ -55,8 +55,13 @@ jobs:
                     push: true
                     tags: ${{ env.TAGS }}
                     target: production
-                    cache-from: type=gha
-                    cache-to: type=gha,mode=max
+                    cache-from: |
+                        type=registry,ref=samisauchda/sensor-container:buildcache
+                        type=gha,scope=production
+                        type=gha,scope=lint
+                    cache-to: |
+                        type=registry,ref=samisauchda/sensor-container:buildcache,mode=max
+                        type=gha,mode=max,scope=production
 
             -   name: Image push summary
                 run: |
