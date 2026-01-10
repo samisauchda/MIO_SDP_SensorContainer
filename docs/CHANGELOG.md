@@ -33,3 +33,8 @@ All notable changes to this project will be documented in this file.
 ## v1.1
 ### Fixed
 - fixed an error in the docker-compose file where the eocker-compose file did not get the correct image from the repository
+
+## v1.2
+### Changed
+- removed development tools from production image
+- further adjustments to release and build pipeline
