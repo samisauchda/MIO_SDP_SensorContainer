@@ -86,6 +86,7 @@ jobs:
                     platforms: linux/arm64,linux/amd64
                     push: false
                     tags: mio_sdp_container:latest
+                    target: lint
                     cache-from: type=gha
                     cache-to: type=gha,mode=max
 
