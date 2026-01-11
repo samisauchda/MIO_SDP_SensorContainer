@@ -19,13 +19,24 @@ def on_connect(client, userdata, flags, rc):
         print(f"Failed to connect, return code {rc}")
 
 
-def publish_discovery_config(client, device_name, sensor_type,
-                             unit_of_measurement, device_class):
+def publish_discovery_config(
+    client,
+    device_name,
+    sensor_type,
+    unit_of_measurement=None,
+    device_class=None,
+    unitOfMeasurement=None  # backward compatibility for tests
+):
     """
     Publish Home Assistant MQTT Discovery configuration
+    Backward compatible with old test calls.
     """
-    device_id = device_name.lower().replace(" ", "_")
 
+    # Backward compatibility: tests use unitOfMeasurement
+    if unit_of_measurement is None and unitOfMeasurement is not None:
+        unit_of_measurement = unitOfMeasurement
+
+    device_id = device_name.lower().replace(" ", "_")
     topic = f"homeassistant/sensor/{device_id}_{sensor_type}/config"
 
     payload = {
@@ -47,9 +58,7 @@ def publish_discovery_config(client, device_name, sensor_type,
 
 
 def simulate_sensor_value(min_val, max_val, noise=0.0):
-    """
-    Simulate a sensor value with optional noise
-    """
+    """Simulate a sensor value with optional noise"""
     base_value = random.uniform(min_val, max_val)
     noisy_value = base_value + random.uniform(-noise, noise)
     return round(noisy_value, 2)
@@ -59,18 +68,18 @@ def main():
     print("Loading configuration...")
     config = load_config("SENSOR_SIMULATION/config.yml")
 
-    # MQTT config
+    # MQTT configuration
     mqtt_cfg = config["mqtt"]
     broker = mqtt_cfg["broker"]
     port = mqtt_cfg["port"]
     username = mqtt_cfg["username"]
     password = mqtt_cfg["password"]
 
-    # Device config
+    # Device configuration
     device_name = config["device"]["name"]
     device_id = device_name.lower().replace(" ", "_")
 
-    # Sensor config (first sensor entry)
+    # Sensor configuration (first sensor entry)
     sensor_cfg = config["sensors"][0]
     update_interval = sensor_cfg["update_interval"]
 
@@ -82,7 +91,7 @@ def main():
     temp_noise = sensor_cfg.get("temperature_noise", 0.0)
     hum_noise = sensor_cfg.get("humidity_noise", 0.0)
 
-    # MQTT client
+    # MQTT client setup
     client = mqtt.Client(client_id=f"{device_id}_sensor_container")
     client.username_pw_set(username, password)
     client.on_connect = on_connect
@@ -93,7 +102,7 @@ def main():
 
     time.sleep(2)
 
-    # Home Assistant Discovery
+    # Home Assistant discovery
     print("Publishing Home Assistant discovery configs...")
     publish_discovery_config(
         client,
@@ -125,7 +134,6 @@ def main():
             client.publish(hum_topic, humidity)
 
             print(f"Published temperature={temperature} °C, humidity={humidity} %")
-
             time.sleep(update_interval)
 
     except KeyboardInterrupt:
